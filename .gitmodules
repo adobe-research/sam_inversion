@@ -1,0 +1,15 @@
+[submodule "src/nets/stylegan3"]
+	path = src/nets/stylegan3
+	url = https://github.com/NVlabs/stylegan3
+[submodule "src/nets/pytorch-deeplab-xception"]
+	path = src/nets/pytorch-deeplab-xception
+	url = https://github.com/jfzhang95/pytorch-deeplab-xception
+[submodule "src/nets/semantic-segmentation-pytorch"]
+	path = src/nets/semantic-segmentation-pytorch
+	url = https://github.com/CSAILVision/semantic-segmentation-pytorch
+[submodule "src/nets/encoder4editing"]
+	path = src/nets/encoder4editing
+	url = https://github.com/omertov/encoder4editing
+[submodule "src/nets/face-parsing.PyTorch"]
+	path = src/nets/face-parsing.PyTorch
+	url = https://github.com/zllrunning/face-parsing.PyTorch
