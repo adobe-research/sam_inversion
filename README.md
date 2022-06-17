@@ -1,6 +1,6 @@
 # Spatially-Adapive Multilayer (SAM) Inversion
 
-[**Project Page**](https://www.cs.cmu.edu/~SAMInversion/) | [**Paper**](TODO) 
+[**Project Page**](https://www.cs.cmu.edu/~SAMInversion/) | [**Paper**](https://arxiv.org/abs/2206.08357) 
 
 <p align="center">
 <img src="resources/teaser_prepped.gif" />
@@ -32,7 +32,7 @@ Subsequently, for intermediate feature space Fi, we predict the change in layerâ
 <img src="resources/invertibility_map.png" style="width:75%;"/>
 </p>
 We begin with predicting how difficult each region of the image is to invert for every latent layer using our trained 
-invertibility network $S$. Subsequently we refine the predicted map using a semantic segmentation network and 
+invertibility network S. Subsequently we refine the predicted map using a semantic segmentation network and 
 combine them using the user-specified threshold Ï„ . This combined invertibility map shown on the right and 
 used to determine the latent layer to be used for inverting each segment in the image.
 
