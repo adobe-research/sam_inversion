@@ -45,8 +45,12 @@ Below we show image inversion and editing results obtained using the proposed me
 </p>
 
 
-## Quick Start
-
+## Getting Started
+Clone this repo:
+```bash
+git clone git@github.com:adobe-research/sam_inversion.git
+cd sam_inversion
+```
 ### Environment Setup
 See [environment.yml](environment.yml) for a full list of library dependencies.
 The following commands can be used to install all the dependencies in a new conda environment.
@@ -57,7 +61,7 @@ conda activate inversion
 
 ### Inversion
 An example command for inverting an image for a given target image is shown below. The `--image_category` should be one of {"cars", "faces", "cats"}. The `--sweep_threshold` will perform inversion for a range of different threshold values. See [file](src/sam_inv_optimization.py) for other optional flags.
-```
+```bash
 python src/sam_inv_optimization.py \
     --image_category "cars" --image_path test_images/cars/b.png \
     --output_path "output/cars/" --sweep_thresholds --generate_edits
@@ -66,7 +70,7 @@ python src/sam_inv_optimization.py \
 ### Using a Custom Dataset
 To perform SAM Inversion on a custom dataset, we need to train a corresponding invertibility network.
 First, perform a single layer inversion using all candidate latent spaces as shown in the command below for all images in the training set.
-```
+```bash
 for latent_name in "W+" "F4" "F6" "F8" "F10"; do
     python src/single_latent_inv.py \
         --image_category "cats" --image_folder_path datasets/custom_images/train \
@@ -76,7 +80,7 @@ done
 ```
 Next, repeat the above for the validation and test splits.
 Finally, train the invertibility network as shown in the example command below.
-```
+```bash
 python src/train_invertibility.py \
     --dataset_folder_train output/custom_ds/train \
     --dataset_folder_val output/custom_ds/val \
@@ -96,6 +100,9 @@ year={2022}
 }
 ```
 
+## Related Projects
+Please check out our past GANs inversion projects:<br>
+[iGAN](https://github.com/junyanz/iGAN) (ECCV 2016), [GANPaint](https://ganpaint.io/) (SIGGRAPH 2019), [GANSeeing](https://github.com/davidbau/ganseeing) (ICCV 2019), [pix2latent](https://github.com/minyoungg/pix2latent) (ECCV 2020)
 
 ## Acknowledgment
 Our work is built partly based on the following repos:
