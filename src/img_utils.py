@@ -1,4 +1,3 @@
-import numpy as np
 import torchvision.transforms as transforms
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -41,8 +40,8 @@ def segments2rgb(seg_map, outf):
 def view_invertibility(image_input, d_invmap, outf):
     NL = len(d_invmap.keys())
     # show first images from the current batch
-    f, axs = plt.subplots(1,NL+1,figsize=(5*(NL+1), 5*1))
-    axs[0].imshow(tensor2pil(image_input[0])) # target image
+    f, axs = plt.subplots(1, NL+1, figsize=(5*(NL+1), 5*1))
+    axs[0].imshow(tensor2pil(image_input[0]))  # target image
     for l_idx in range(NL):
         l_name = list(d_invmap.keys())[l_idx]
         axs[1+l_idx].set_title(f"latent-{l_name}")
@@ -55,15 +54,15 @@ def view_invertibility(image_input, d_invmap, outf):
 def b_view_invertibility(image_input, d_invmap, outf, rec=None, return_fig=False):
     B = image_input.shape[0]
     NL = len(d_invmap.keys())
-    f, axs = plt.subplots(B,NL+2,figsize=(5*(NL+2), 5*B))
+    f, axs = plt.subplots(B, NL+2, figsize=(5*(NL+2), 5*B))
     for bidx in range(B):
-        axs[bidx,0].imshow(tensor2pil(image_input[bidx]))
+        axs[bidx, 0].imshow(tensor2pil(image_input[bidx]))
         for l_idx in range(NL):
             l_name = list(d_invmap.keys())[l_idx]
             axs[bidx, 2+l_idx].set_title(f"latent-{l_name}")
             curr_hm = d_invmap[l_name][bidx].squeeze(0).detach().cpu().numpy()
             axs[bidx, 2+l_idx].imshow(curr_hm, vmin=0, vmax=1)
-        axs[bidx,1].imshow(tensor2pil(rec[bidx]))
+        axs[bidx, 1].imshow(tensor2pil(rec[bidx]))
     plt.savefig(outf)
     plt.close()
     if return_fig:

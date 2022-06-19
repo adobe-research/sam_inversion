@@ -1,9 +1,6 @@
-import os
 import sys
 import argparse
 import torch
-import wget
-from torch.nn import functional as F
 
 
 class layer_head(torch.nn.Module):

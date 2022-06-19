@@ -3,6 +3,7 @@ import sys
 import argparse
 import matplotlib.pyplot as plt
 import lpips
+import torch
 sys.path.append("./src/nets/pytorch-deeplab-xception")
 from modeling.deeplab import DeepLab
 from utils.lr_scheduler import LR_Scheduler
@@ -21,10 +22,8 @@ def arguments():
     p.add_argument("--train_val_split", type=float, default=0.8)
     p.add_argument('--base-size', type=int, default=256)
     p.add_argument('--crop-size', type=int, default=256)
-    
     # latent space details
     p.add_argument("--latent_space_name", default="W+,F4,F6,F8,F10")
-    
     # optimization parameters
     p.add_argument('--backbone', type=str, default='resnet', choices=['resnet', 'xception', 'drn', 'mobilenet'])
     p.add_argument('--out-stride', type=int, default=16)
@@ -37,18 +36,14 @@ def arguments():
     p.add_argument('--lr-scheduler', type=str, default='poly', choices=['poly', 'step', 'cos'])
     p.add_argument('--momentum', type=float, default=0.9)
     p.add_argument('--weight-decay', type=float, default=5e-4)
-    
     p.add_argument("--log_frequency", type=int, default=100)
     p.add_argument("--viz_frequency", type=int, default=100)
     p.add_argument('--eval-interval', type=int, default=1)
     p.add_argument('--ckpt_interval', type=int, default=5)
-
     p.add_argument('--loss-type', type=str, default='ce', choices=['ce', 'focal'])
-
     p.add_argument('--gpu-ids', type=str, default='0',
                         help='use which gpu to train, must be a \
                         comma-separated list of integers only (default=0)')
-    
     p.add_argument("--lpips_type", default="vgg", choices=["vgg", "alex"])
     return p
 
@@ -70,7 +65,7 @@ class Trainer():
         self.d_heads = {}
         for n in self.latent_names:
             self.d_heads[n] = torch.nn.DataParallel(layer_head()).cuda()
-        
+
         # define the dataloaders
         self.train_loader, self.val_loader = make_invertibility_loader(args)
 
@@ -106,7 +101,6 @@ class Trainer():
             d_target_hm = {}
             with torch.no_grad():
                 for n in self.latent_names:
-                    _rec = d_latent_recs[n]
                     d_target_hm[n] = self.net_lp(d_latent_recs[n], image_input)
             self.scheduler(self.optimizer, i, epoch, self.best_pred)
             self.optimizer.zero_grad()
@@ -121,29 +115,28 @@ class Trainer():
             self.optimizer.step()
             train_loss += loss.item()
 
-            if (i)%args.log_frequency==0:
+            if (i) % args.log_frequency == 0:
                 curr_train_loss = train_loss/(i+1)
                 log_str = f"[EP:{epoch:02d}, step-{i:04d}] Train loss: {(curr_train_loss):.3f}"
                 print_and_save(log_str, self.f_log)
-                
-            if (i)%args.viz_frequency==0:
+
+            if (i) % args.viz_frequency == 0:
                 outf = os.path.join(args.output_folder, f"images/ep{epoch:03d}_{i}.jpg")
                 NL = len(self.latent_names)
-                BS = image_input.shape[0]
                 # show first images from the current batch
-                f, axs = plt.subplots(3,NL+1,figsize=(5*(NL+1), 5*3))
-                axs[0,0].imshow(tensor2pil(image_input[0])) # target image
-                axs[1,0].imshow(tensor2pil(image_input[0])) # target image
-                axs[2,0].imshow(tensor2pil(image_input[0])) # target image
-                vmin = d_target_hm[n][0].min()#min(out_cmb[:,0].min(), target_cmb[:,0].min())
-                vmax = d_target_hm[n][0].max()#max(out_cmb[:,0].max(), target_cmb[:,0].max())
+                f, axs = plt.subplots(3, NL+1, figsize=(5*(NL+1), 5*3))
+                axs[0, 0].imshow(tensor2pil(image_input[0]))  # target image
+                axs[1, 0].imshow(tensor2pil(image_input[0]))
+                axs[2, 0].imshow(tensor2pil(image_input[0]))
+                vmin = d_target_hm[n][0].min()
+                vmax = d_target_hm[n][0].max()
                 for _, n in enumerate(self.latent_names):
-                    axs[0,1+_].set_title(f"latent-{n}")
-                    axs[0,1+_].imshow(tensor2pil(d_latent_recs[n][0])) # target image
+                    axs[0, 1+_].set_title(f"latent-{n}")
+                    axs[0, 1+_].imshow(tensor2pil(d_latent_recs[n][0]))  # target image
                     curr_gt = d_target_hm[n][0].squeeze(0).detach().cpu().numpy()
-                    axs[1,1+_].imshow(curr_gt, cmap="Blues",vmin=vmin, vmax=vmax)
+                    axs[1, 1+_].imshow(curr_gt, cmap="Blues", vmin=vmin, vmax=vmax)
                     curr_pred = d_out[n][0].squeeze(0).detach().cpu().numpy()
-                    axs[2,1+_].imshow(curr_pred, cmap="Blues",vmin=vmin, vmax=vmax)
+                    axs[2, 1+_].imshow(curr_pred, cmap="Blues", vmin=vmin, vmax=vmax)
                 plt.savefig(outf)
                 plt.close(f)
 
@@ -163,7 +156,6 @@ class Trainer():
             d_target_hm = {}
             with torch.no_grad():
                 for n in self.latent_names:
-                    _rec = d_latent_recs[n]
                     d_target_hm[n] = self.net_lp(d_latent_recs[n], image_input)
             # get intermediate prediction
             _out = self.model(image_input)
@@ -174,22 +166,21 @@ class Trainer():
             loss = self.criterion(out_cmb, target_cmb)
             val_loss += loss.item()
 
-            if (i)%args.viz_frequency==0:
+            if (i) % args.viz_frequency == 0:
                 outf = os.path.join(args.output_folder, f"images/VAL_ep{epoch:03d}_{i}.jpg")
                 NL = len(self.latent_names)
-                BS = image_input.shape[0]
                 # show first images from the current batch
-                f, axs = plt.subplots(3,NL+1,figsize=(5*(NL+1), 5*3))
-                axs[0,0].imshow(tensor2pil(image_input[0])) # target image
-                axs[1,0].imshow(tensor2pil(image_input[0])) # target image
-                axs[2,0].imshow(tensor2pil(image_input[0])) # target image
+                f, axs = plt.subplots(3, NL+1, figsize=(5*(NL+1), 5*3))
+                axs[0, 0].imshow(tensor2pil(image_input[0]))  # target image
+                axs[1, 0].imshow(tensor2pil(image_input[0]))
+                axs[2, 0].imshow(tensor2pil(image_input[0]))
                 for _, n in enumerate(self.latent_names):
-                    axs[0,1+_].set_title(f"latent-{n}")
-                    axs[0,1+_].imshow(tensor2pil(d_latent_recs[n][0]))
+                    axs[0, 1+_].set_title(f"latent-{n}")
+                    axs[0, 1+_].imshow(tensor2pil(d_latent_recs[n][0]))
                     curr_gt = d_target_hm[n][0].squeeze(0).detach().cpu().numpy()
-                    axs[1,1+_].imshow(curr_gt, cmap="Blues",vmin=0, vmax=1)
+                    axs[1, 1+_].imshow(curr_gt, cmap="Blues", vmin=0, vmax=1)
                     curr_pred = d_out[n][0].squeeze(0).detach().cpu().numpy()
-                    axs[2,1+_].imshow(curr_pred, cmap="Blues",vmin=0, vmax=1)
+                    axs[2, 1+_].imshow(curr_pred, cmap="Blues", vmin=0, vmax=1)
                 plt.savefig(outf)
                 plt.close(f)
         log_str = f"[EP:{epoch:02d} => Val loss: {(val_loss/(len(self.val_loader))):.3f}\n\n"
@@ -212,9 +203,9 @@ if __name__ == "__main__":
     T = Trainer(args)
     for ep in range(0, args.epochs):
         T.training(ep)
-        if ep%args.eval_interval==(args.eval_interval-1):
+        if ep % args.eval_interval == (args.eval_interval-1):
             val_loss = T.validation(ep)
-        if ep%args.ckpt_interval==(args.ckpt_interval-1):
+        if ep % args.ckpt_interval == (args.ckpt_interval-1):
             outf = os.path.join(args.output_folder, f"ckpt/{ep:03d}_main.pt")
             sd = T.model.state_dict()
             torch.save(sd, outf)
