@@ -1,0 +1,27 @@
+build:
+  gpu: true
+  python_version: "3.8"
+  system_packages:
+    - "libgl1-mesa-glx"
+    - "libglib2.0-0"
+  python_packages:
+    - torch==1.9.0
+    - Pillow==7.0.0
+    - numpy==1.19.4
+    - torchvision==0.10.0
+    - matplotlib==3.3.3
+    - lpips==0.1.4
+    - wget==3.2
+    - yacs==0.1.8
+    - ninja==1.10.2.3
+  # run:
+    # - wget https://download.pytorch.org/models/resnet101-5d3b4d8f.pth -O /root/.cache/torch/hub/checkpoints/resnet101-5d3b4d8f.pth
+    # - wget https://download.pytorch.org/models/vgg16-397923af.pth /root/.cache/torch/hub/checkpoints/vgg16-397923af.pth
+  #   - git clone https://github.com/NVlabs/stylegan3 src/nets/stylegan3 
+  #   - git clone https://github.com/jfzhang95/pytorch-deeplab-xception src/nets/pytorch-deeplab-xception
+  #   - git clone https://github.com/CSAILVision/semantic-segmentation-pytorch src/nets/semantic-segmentation-pytorch
+  #   - git clone https://github.com/omertov/encoder4editing src/nets/encoder4editing
+  #   - git clone https://github.com/zllrunning/face-parsing.PyTorch src/nets/face-parsing.PyTorch
+  #   - git clone https://github.com/lucidrains/stylegan2-pytorch.git src/stylegan2-pytorch
+
+predict: "src/predict.py:Predictor"
