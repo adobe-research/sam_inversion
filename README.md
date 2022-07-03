@@ -48,7 +48,7 @@ Below we show image inversion and editing results obtained using the proposed me
 ## Getting Started
 Clone this repo:
 ```bash
-git clone git@github.com:adobe-research/sam_inversion.git
+git clone --recurse-submodules git@github.com:adobe-research/sam_inversion.git
 cd sam_inversion
 ```
 ### Environment Setup
