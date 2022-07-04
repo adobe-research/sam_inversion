@@ -111,7 +111,7 @@ if __name__ == "__main__":
         if args.gan_weights is None:
             args.gan_weights = "ckpt/stylegan2-cat-config-f_sg2adapyt.pkl"
             if not os.path.exists(args.gan_weights):
-                url = "https://www.cs.cmu.edu/~SAMInversion/ckpt/stylegan2-ffhq-config-f.pkl"
+                url = "https://www.cs.cmu.edu/~SAMInversion/ckpt/stylegan2-cat-config-f_sg2adapyt.pkl"
                 wget.download(url, args.gan_weights)
         if args.e4e_path is None:
             args.e4e_path = "ckpt/e4e_lsuncats_encode.pt"
