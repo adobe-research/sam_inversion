@@ -1,6 +1,6 @@
 # Spatially-Adaptive Multilayer (SAM) GAN Inversion
 
-[**Project Page**](https://www.cs.cmu.edu/~SAMInversion/) | [**Paper**](https://arxiv.org/abs/2206.08357)
+[**Project Page**](https://www.cs.cmu.edu/~SAMInversion/) | [**Paper**](https://arxiv.org/abs/2206.08357) | [**Demo & docker image**](https://replicate.com/adobe-research/sam_inversion)
 
 <p align="center">
 <img src="resources/teaser_prepped.gif" />
